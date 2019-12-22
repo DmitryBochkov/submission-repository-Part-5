@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
+import Notification from './components/Notification';
 import loginService from './services/login';
 import blogsService from './services/blogs';
 
@@ -15,6 +16,7 @@ const App = () => {
     author: '',
     url: ''
   })
+  const [notification, setNotification] = useState({ message: null })
 
   useEffect(() => {
     blogsService
@@ -41,8 +43,10 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      showNotification(`Welcome to the app, ${user.username}!`)
     } catch (error) {
-      console.log(error)      
+      console.log(error)
+      showNotification('Wrong usename or password.', 'error')   
     }
     
   }
@@ -61,7 +65,15 @@ const App = () => {
       author: '',
       url: ''
     })
+    showNotification(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} was successfully created.`)
   }
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type })
+    setTimeout(() => {
+      setNotification({ message: null })
+    }, 3000)
+  } 
 
   const loginForm = () => (
     <div>
@@ -106,6 +118,7 @@ const App = () => {
 
   return (
     <div>
+      <Notification notification={notification} />
       { user === null ? loginForm() : blogRows() }
     </div>
   )
